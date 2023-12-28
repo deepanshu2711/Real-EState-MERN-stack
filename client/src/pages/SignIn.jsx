@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import {Link ,useNavigate } from "react-router-dom";
+import { useDispatch ,useSelector } from 'react-redux';
+import { signinStart, signinSuccess, signinFailure } from '../../redux/user/UserSlice.js';
 
 
 function SignIn(props) {
     const[formdata ,setformdata] = useState({});
-    const[error ,seterror] = useState(null);
-    const[loading,setloading] = useState(false);
+    const {loading ,error} = useSelector((state) => state.user);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     function handelChange(e) {
         setformdata({
@@ -18,8 +20,7 @@ function SignIn(props) {
     async function handleSubmit(e) {
         e.preventDefault();
         try {
-            setloading(true);
-            seterror(null);
+            dispatch(signinStart());
             const res = await fetch("/api/auth/signin" ,{                         //added proxy in vite.config.js
                 method:"POST",
                 headers:{
@@ -30,15 +31,13 @@ function SignIn(props) {
             const data = await res.json();  
             
             if(data.success === false){
-                seterror(data.message);
-                setloading(false);
+                dispatch(signinFailure(data));
                 return;
             }
-            setloading(false);
-            seterror(false);
+            dispatch(signinSuccess(data));
             navigate("/");
         } catch (error) {
-            setloading(false);
+            dispatch(signinFailure(error.message));
             
         }
     }
@@ -59,7 +58,7 @@ function SignIn(props) {
                 </Link>
             </div>
             <div>
-                <p className='text-red-500 text-center mt-12'>{error && error}</p>
+                <p className='text-red-500 text-center mt-12'>{error && error.message}</p>
             </div>
         </div>
     );
