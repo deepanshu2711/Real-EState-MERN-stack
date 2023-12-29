@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch ,useSelector } from 'react-redux';
-import { signinStart, signinSuccess, signinFailure } from '../../redux/user/UserSlice.js';
+import { signinStart, signinSuccess, signinFailure, updateUserStart, updateUserSuccess, updateUserFailure } from '../../redux/user/UserSlice.js';
 import { useRef ,useEffect } from 'react';
 import { useState } from 'react';
 import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage';
@@ -8,12 +8,13 @@ import {app} from "../Firebase.js"
 
 function Profile(props) {
     const[file,setfile] = useState(undefined);
-    const {currentUser} = useSelector((state) => state.user);
+    const {currentUser,loading,error} = useSelector((state) => state.user);
     const fileRef = useRef(null);
     const dispatch = useDispatch();
     const [filepercentage,setfilepercentage] = useState(0);
     const[fileerreror,setfileerror] = useState(null);
     const[formdata,setformdata] = useState({});
+    const[updateSuccess,setpdateSuccess] = useState(false);
     
     
 
@@ -48,12 +49,43 @@ function Profile(props) {
         handelFileUpload(file);
     },[file])
 
+    function handleChange(e) {
+        setformdata({
+            ...formdata,
+            [e.target.id]:e.target.value
+        })
+    }
+
+    async function handlesubmit(e) {
+        e.preventDefault();
+        try {
+            dispatch(updateUserStart());
+            const res = await fetch(`/api/user/update/${currentUser._id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formdata)
+            });
+            const data = await res.json();
+            if(data.success === false){
+                dispatch(updateUserFailure(data));
+                return;
+            }
+            dispatch(updateUserSuccess(data));
+            setpdateSuccess(true)
+        } catch (error) {
+            dispatch(updateUserFailure(error.message));
+        }
+    }
+
     return (
         <div className='flex w-full h-screen'>
             <div className='w-1/3 bg-custom_green-400 bg-opacity-80 h-screen flex flex-col gap-4'>
                 
                 <input type='file' onChange={(e) => setfile(e.target.files[0])} ref={fileRef} hidden accept='/image/*' />
                 <img  onClick={() => fileRef.current.click()} className='rounded-full h-40 w-40 object-cover self-center mt-12 border border-slate-950 cursor-pointer' src={ formdata.avatar ||currentUser.avatar} alt='profile image' />
+                
                 <p className='text-sm self-center'>
           {fileerreror ? (
             <span className='text-red-700'>
@@ -71,19 +103,22 @@ function Profile(props) {
                 <h1 className='text-center text-white font-semibold text-2xl'>{currentUser.username}</h1>
                 <h1 className='text-center text-white font-bold text-2xl '>{currentUser.email}</h1>
                 <div className='flex justify-between p-7 mt-48'>
-                    <span className='cursor-pointer bg-red-500 p-1 text-white rounded-lg'>Delete Account</span>
-                    <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg'>Sign Out</span>
+                    <span className='cursor-pointer bg-red-500 p-1 text-white rounded-lg border shadow-md'>Delete Account</span>
+                    <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg border shadow-md'>Sign Out</span>
                 </div>
             </div>
             <div className='flex flex-col w-2/3 justify-start items-center mt-4 gap-48  '>
                 <h1 className='text-3xl text-center font-bold text-custom_green-400'>Profile</h1>
-                <form className='flex flex-col gap-3'>
-                    <input id='username' type='text' placeholder='username' className='border border-black p-3 rounded-lg '/>
-                    <input id='email' type='text' placeholder='email' className='border p-3 border-black rounded-lg '/>
-                    <input id='password' type='text' placeholder='password' className='border p-3 border-black rounded-lg '/>
-                    <button className='bg-custom_green-400 text-white p-3 rounded-lg uppercase hover:opacity-95'>Update</button>
+                <form className='flex flex-col gap-3' onSubmit={handlesubmit}>
+                    <input defaultValue={currentUser.username} id='username' type='text' placeholder='username' className='border border-black p-3 rounded-lg 'onChange={handleChange}/>
+                    <input defaultValue={currentUser.email} id='email' type='text' placeholder='email' className='border p-3 border-black rounded-lg 'onChange={handleChange}/>
+                    <input id='password' type='text' placeholder='password' className='border p-3 border-black rounded-lg 'onChange={handleChange}/>
+                    <button className='bg-custom_green-400 text-white p-3 rounded-lg uppercase hover:opacity-95'>{loading?"loading...":"update"}</button>
+                    <p className='text-custom_green-300 mt-3'>{updateSuccess ? "User is updated successfully" : ""}</p>
                 </form>
+                
             </div>
+            
         </div>
     );
 }
