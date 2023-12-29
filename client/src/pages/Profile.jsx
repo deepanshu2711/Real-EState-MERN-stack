@@ -1,13 +1,73 @@
 import React from 'react';
 import { useDispatch ,useSelector } from 'react-redux';
 import { signinStart, signinSuccess, signinFailure } from '../../redux/user/UserSlice.js';
+import { useRef ,useEffect } from 'react';
+import { useState } from 'react';
+import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage';
+import {app} from "../Firebase.js"
 
 function Profile(props) {
+    const[file,setfile] = useState(undefined);
     const {currentUser} = useSelector((state) => state.user);
+    const fileRef = useRef(null);
+    const dispatch = useDispatch();
+    const [filepercentage,setfilepercentage] = useState(0);
+    const[fileerreror,setfileerror] = useState(null);
+    const[formdata,setformdata] = useState({});
+    
+    
+
+    function handelFileUpload(file) {
+        if (file) {
+            const storage = getStorage(app);
+            const filename = new Date().getTime() + file.name;
+            const storageRef = ref(storage, filename);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setfilepercentage(Math.round(progress));
+                    
+                },
+                (error)=>{
+                    setfileerror(true);
+                },
+                (async ()=>{
+                    await getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        setformdata({
+                            ...formdata,
+                            avatar:downloadURL
+                        })
+                    });
+                })
+                
+        )}
+    }
+
+    useEffect(()=>{
+        handelFileUpload(file);
+    },[file])
+
     return (
         <div className='flex w-full h-screen'>
             <div className='w-1/3 bg-custom_green-400 bg-opacity-80 h-screen flex flex-col gap-4'>
-                <img className='rounded-full h-40 w-40 object-cover self-center mt-12 border border-slate-950' src={currentUser.avatar} alt='profile image' />
+                
+                <input type='file' onChange={(e) => setfile(e.target.files[0])} ref={fileRef} hidden accept='/image/*' />
+                <img  onClick={() => fileRef.current.click()} className='rounded-full h-40 w-40 object-cover self-center mt-12 border border-slate-950 cursor-pointer' src={ formdata.avatar ||currentUser.avatar} alt='profile image' />
+                <p className='text-sm self-center'>
+          {fileerreror ? (
+            <span className='text-red-700'>
+              Error Image upload (image must be less than 2 mb)
+            </span>
+          ) : filepercentage > 0 && filepercentage < 100 ? (
+            <span className='text-slate-700'>{`Uploading ${filepercentage}%`}</span>
+          ) : filepercentage === 100 ? (
+            <span className='bg-custom_green-300 text-white p-1 rounded-lg'>Image successfully uploaded!</span>
+          ) : (
+            ''
+          )}
+        </p>
+                
                 <h1 className='text-center text-white font-semibold text-2xl'>{currentUser.username}</h1>
                 <h1 className='text-center text-white font-bold text-2xl '>{currentUser.email}</h1>
                 <div className='flex justify-between p-7 mt-48'>
