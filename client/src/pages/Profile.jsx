@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch ,useSelector } from 'react-redux';
-import { signinStart, signinSuccess, signinFailure, updateUserStart, updateUserSuccess, updateUserFailure } from '../../redux/user/UserSlice.js';
+import { signinStart, signinSuccess, signinFailure, updateUserStart, updateUserSuccess, updateUserFailure,deleteUserStart,deleteUserSuccess,deleteUserFailure } from '../../redux/user/UserSlice.js';
 import { useRef ,useEffect } from 'react';
 import { useState } from 'react';
 import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage';
@@ -79,6 +79,26 @@ function Profile(props) {
         }
     }
 
+    async function handleDelete (e) {
+        try {
+            dispatch(deleteUserStart())
+            const res  = await fetch(`/api/user/delete/${currentUser._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            const data = await res.json();
+            if(data.success === false){
+                dispatch(deleteUserFailure(data));
+                return;
+            }
+            dispatch(deleteUserSuccess(data));
+        } catch (error) {
+            dispatch(deleteUserFailure(error.message));
+        }
+    }
+
     return (
         <div className='flex w-full h-screen'>
             <div className='w-1/3 bg-custom_green-400 bg-opacity-80 h-screen flex flex-col gap-4'>
@@ -103,7 +123,7 @@ function Profile(props) {
                 <h1 className='text-center text-white font-semibold text-2xl'>{currentUser.username}</h1>
                 <h1 className='text-center text-white font-bold text-2xl '>{currentUser.email}</h1>
                 <div className='flex justify-between p-7 mt-48'>
-                    <span className='cursor-pointer bg-red-500 p-1 text-white rounded-lg border shadow-md'>Delete Account</span>
+                    <span className='cursor-pointer bg-red-500 p-1 text-white rounded-lg border shadow-md' onClick={handleDelete}>Delete Account</span>
                     <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg border shadow-md'>Sign Out</span>
                 </div>
             </div>
