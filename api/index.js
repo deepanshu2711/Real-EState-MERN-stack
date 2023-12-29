@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import AuthRouter from "./routes/AuthRoutex.js"
 import UserRouter from "./routes/UserRoutes.js"
 dotenv.config();
@@ -9,8 +10,10 @@ dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>console.log("DB connected"))   //application string
 
 const app = express();
-app.use(express.json());                                         //Allow send json to server
+app.use(express.json());           
+app.use(cookieParser());                              //Allow send json to server
 app.use("/api/auth" ,AuthRouter);
+app.use('/api/user' ,UserRouter);
 
 app.get("/test" ,(req,res) =>{
     res.json({ message : "Hello from API"});
