@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import AuthRouter from "./routes/AuthRoutex.js"
 import UserRouter from "./routes/UserRoutes.js"
+import ListingRouter from "./routes/ListingRoute.js"
 dotenv.config();
 
 
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(cookieParser());                              //Allow send json to server
 app.use("/api/auth" ,AuthRouter);
 app.use('/api/user' ,UserRouter);
-
+app.use("/api/listing",ListingRouter);
 app.get("/test" ,(req,res) =>{
     res.json({ message : "Hello from API"});
 })
