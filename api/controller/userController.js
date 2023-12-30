@@ -1,5 +1,7 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/User.model.js";
+import { errorHandler } from "../utils/error.js";
+import Listing from "../models/ListingModel.js";
 
 export const updateUser =async(req,res,next) =>{
     if(req.user.id !== req.params.id){
@@ -30,5 +32,19 @@ export const deleteUser = async(req,res,next) =>{
         } catch (error) {
             next(error)
         }
+    }
+}
+
+
+export const getuserListing = async(req,res,next) =>{
+    if(req.user.id === req.params.id){
+        try {
+            const listings = await Listing.find({userRef:req.user.id});
+            res.status(200).json(listings);
+        } catch (error) {
+            next(error)
+        }
+    }else{
+        return next(errorHandler(403,"you can update only your account"));
     }
 }
