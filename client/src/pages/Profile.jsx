@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch ,useSelector } from 'react-redux';
+import{Link} from "react-router-dom";
 import { signinStart, signinSuccess, signinFailure, 
     updateUserStart, updateUserSuccess, updateUserFailure,
     deleteUserStart,deleteUserSuccess,deleteUserFailure,
@@ -153,6 +154,9 @@ function Profile(props) {
                     <input defaultValue={currentUser.email} id='email' type='text' placeholder='email' className='border p-3 border-black rounded-lg 'onChange={handleChange}/>
                     <input id='password' type='text' placeholder='password' className='border p-3 border-black rounded-lg 'onChange={handleChange}/>
                     <button className='bg-custom_green-400 text-white p-3 rounded-lg uppercase hover:opacity-95'>{loading?"loading...":"update"}</button>
+                    <Link className='bg-custom_green-300 p-3 text-white font-bold uppercase rounded-lg text-center border hover:opacity-95' to='/createListing'>
+                        <h1>Create Listing</h1>
+                    </Link>
                     <p className='text-custom_green-300 mt-3'>{updateSuccess ? "User is updated successfully" : ""}</p>
                 </form>
                 
