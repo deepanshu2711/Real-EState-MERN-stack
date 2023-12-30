@@ -1,6 +1,72 @@
-import React from 'react';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useState } from 'react';
+import { app } from '../Firebase.js';
 
 function CreateListing(props) {
+    const [files ,setfiles] = useState([]);
+    const[formdata,setformdata] = useState({
+        imageUrls:[],
+    });
+    const[imageUploaderr,setImageUploadError] = useState(false);
+    const[uploading,setuploading] = useState(false);
+    
+    
+    function handleImageSubmit(e) {
+        e.preventDefault();
+        if(files.length>0 && files.length + formdata.imageUrls.length <7){
+            setuploading(true);
+            setImageUploadError(false);
+            const promises = [];
+            for(let i = 0; i<files.length ; i++){
+                promises.push(storeimage(files[i]));
+            }
+            Promise.all(promises).then((urls) => {
+                setformdata({
+                    ...formdata,
+                    imageUrls:formdata.imageUrls.concat(urls)
+                });
+                setImageUploadError(false);
+                setuploading(false)
+            }).catch((err) =>{
+                setImageUploadError('Image upload failed');
+            })
+            }else{
+                setImageUploadError('Max 6 images can be uploaded');
+                setuploading(false)
+            }
+        }
+    
+    
+
+    async function storeimage(file) {
+        return new Promise((resolve, reject) => {
+            const storage = getStorage(app);
+            const filename = new Date().getTime() + file.name;
+            const storageRef = ref(storage, filename);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on(
+                'state_changed',
+                (snapshot) => {
+                },
+                (error) => {
+                    reject(error);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        resolve(downloadURL);
+                    });
+                }
+            );
+    })}
+
+    function handelRemoveImage(index) {
+        setformdata({
+            ...formdata,
+            imageUrls: formdata.imageUrls.filter((url, i) => i !== index)
+        })
+    }
+
     return (
         <main className='p-3 max-w-4xl mx-auto'>
             <h1 className='text-3xl font-semibold text-center my-7 text-custom_green-400'>Create Listing</h1>
@@ -62,15 +128,21 @@ function CreateListing(props) {
                 <span  className='font-normal text-gray-500 ml-2'>The first image will be the cover (max-6)</span>
                 </p>
                 <div className='flex gap-4'>
-                    <input className='p-3 rounded-lg w-full border border-black' type='file' id='images' accept='image/*' multiple />
-                    <button className='p-3 text-gray-600 bg-green-300 rounded-lg hover:opacity-95'>Upload</button>
+                    <input onChange={(e) =>setfiles(e.target.files)} className='p-3 rounded-lg w-full border border-black' type='file' id='images' accept='image/*' multiple />
+                    <button type='button' onClick={handleImageSubmit} className='p-3 text-gray-600 bg-green-300 rounded-lg hover:opacity-95'>{uploading ? 'Uploading...' : 'Upload'}</button>
                 </div>
-                <button className='p-3 bg-custom_green-400 text-white  rounded-lg hover:opacity-95 hover:opacity-95'>CREATE LISTING</button>
+                <p className='text-red-500'>{imageUploaderr && imageUploaderr}</p>
+                {
+                    formdata.imageUrls.length>0 && formdata.imageUrls.map((url ,index) => <div className='flex justify-between p-3 border items-center'>
+                    <img key={url} src={url} alt=';listing image' className='w-20 h-20 rounded-lg object-contain ' />
+                    <button type='button' onClick={()=>handelRemoveImage(index)} className='p-3 text-red-700 rounded-lg uppercase hover:opacity-75'>Delete</button>
+                    </div>)
+                }
+                <button className='p-3 bg-custom_green-400 text-white  rounded-lg hover:opacity-95 '>CREATE LISTING</button>
             </div>
             
             </form>
         </main>
     );
 }
-
 export default CreateListing;
