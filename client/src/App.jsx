@@ -9,6 +9,7 @@ import Header from './pages/Header.jsx';
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import CreateListing from "./pages/CreateListing.jsx";
 import UpdateListing from "./pages/updateListing.jsx";
+import Listing from "./pages/listing.jsx";
 
 
 
@@ -31,6 +32,8 @@ function App() {
 
         </Route>
         <Route path='/about' element ={<About />} />
+        <Route path='/listing/:listingId' element ={<Listing />} />
+
       </Routes>
     </BrowserRouter>
   )

@@ -69,8 +69,8 @@ function UpdateListing(props) {
                 setuploading(false)
             }
         }
-    
-    
+
+
 
     async function storeimage(file) {
         return new Promise((resolve, reject) => {
