@@ -218,8 +218,9 @@ function Profile(props) {
                     </Link>
                     <div className='flex flex-col'>
                         <button onClick={()=>handledeleteListing(listing._id)} className='text-red-500 uppercase'>Delete</button>
+                        <Link to ={`/updateListing/${listing._id}`}>
                         <button className='text-green-500 uppercase'>edit</button>
-
+                        </Link>
                     </div>
                     
                 </div>

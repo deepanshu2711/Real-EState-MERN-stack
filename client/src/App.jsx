@@ -8,6 +8,8 @@ import SignUp from './pages/SignUp.jsx';
 import Header from './pages/Header.jsx';
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import CreateListing from "./pages/CreateListing.jsx";
+import UpdateListing from "./pages/updateListing.jsx";
+
 
 
 
@@ -24,6 +26,9 @@ function App() {
         <Route element ={<PrivateRoute />}>
         <Route path='/profile' element ={<Profile />} />
         <Route path='/createListing' element ={<CreateListing />} />
+        <Route path='/createListing' element ={<CreateListing />} />
+        <Route path='/updateListing/:listingId' element ={<UpdateListing />} />
+
         </Route>
         <Route path='/about' element ={<About />} />
       </Routes>
