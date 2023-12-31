@@ -19,6 +19,9 @@ function Profile(props) {
     const[fileerreror,setfileerror] = useState(null);
     const[formdata,setformdata] = useState({});
     const[updateSuccess,setpdateSuccess] = useState(false);
+    const[showListingerroer,setshowListingerroer] = useState(false);
+    const[userListings,setUserListings] = useState([]);
+    
     
     
 
@@ -119,6 +122,25 @@ function Profile(props) {
         }
     }
 
+    async function handleShowListings(e) {
+        
+        try {
+            setshowListingerroer(false);
+            const res = await fetch(`/api/user/listings/${currentUser._id}`);
+            const data = await res.json();
+            
+            if(data.success === false){
+                setshowListingerroer(true);
+                return;
+            }
+            setUserListings(data);
+            
+        } catch (error) {
+            setshowListingerroer(true);                                                   
+        }
+        
+    }
+
     return (
         <div className='flex w-full h-screen'>
             <div className='w-1/3 bg-custom_green-400 bg-opacity-80 h-screen flex flex-col gap-4'>
@@ -147,7 +169,7 @@ function Profile(props) {
                     <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg border shadow-md' onClick={handleSignout}>Sign Out</span>
                 </div>
             </div>
-            <div className='flex flex-col w-2/3 justify-start items-center mt-4 gap-48  '>
+            <div className='flex flex-col w-1/3 justify-start items-center mt-4 gap-48  '>
                 <h1 className='text-3xl text-center font-bold text-custom_green-400'>Profile</h1>
                 <form className='flex flex-col gap-3' onSubmit={handlesubmit}>
                     <input defaultValue={currentUser.username} id='username' type='text' placeholder='username' className='border border-black p-3 rounded-lg 'onChange={handleChange}/>
@@ -160,6 +182,28 @@ function Profile(props) {
                     <p className='text-custom_green-300 mt-3'>{updateSuccess ? "User is updated successfully" : ""}</p>
                 </form>
                 
+            </div>
+            <div className='w-1/3 p-3 flex flex-col items-center'>
+            <button onClick={handleShowListings} className='w-1/3 h-14 text-green-500 font-bold p-3 rounded-lg'>Show Listings</button>
+            <p>{showListingerroer==true &&"Error showing listings"}</p>
+            
+            {userListings  && userListings.length >0 &&
+            userListings.map((listing) =>(
+                <div key={listing._id} className='bg-white gap-4 w-full flex border justify-between p-3 items-center mt-2'>
+                    <Link to={`/listing/${listing._id}`}>
+                        <img className='h-16 w-16 object-contain' src={listing.imageUrls[0]} alt='listingCover' />
+                    </Link>
+                    <Link  className='hover:underline cursor-pointer flex-1 truncate ' to={`/listing/${listing._id}`}>
+                        <p>{listing.name}</p>
+                    </Link>
+                    <div className='flex flex-col'>
+                        <button className='text-red-500 uppercase'>Delete</button>
+                        <button className='text-green-500 uppercase'>edit</button>
+
+                    </div>
+                    
+                </div>
+            ))}
             </div>
             
         </div>
