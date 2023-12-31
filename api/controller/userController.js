@@ -49,3 +49,18 @@ export const getuserListing = async(req,res,next) =>{
         return next(errorHandler(403,"you can update only your account"));
     }
 }
+
+
+export const getUser =async(req,res,next)=>{
+    try {
+        const user = await User.findById(req.params.id);
+        if(!user){
+            return next(errorHandler(404,"User does not exist"));
+        }
+        const {password:pass, ...rest} =user._doc
+        res.status(200).json(rest);
+        
+    } catch (error) {
+        next(error)
+    }
+}

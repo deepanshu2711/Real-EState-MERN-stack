@@ -15,14 +15,15 @@ import {
 import React, { useEffect , useState} from 'react';
 import {useParams} from "react-router-dom"
 import { useSelector } from 'react-redux';
+import Contact from '../components/Contact';
 function Listing(props) {
     SwiperCore.use(Navigation);
     const params = useParams();
     const[listing , setListing] = useState(null);
     const[loading , setLoading] = useState(false);
     const[error ,seterror] = useState(false);
-    
-
+    const{currentUser} = useSelector((state) => state.user);
+    const[contact ,setcontact] = useState(false);
     useEffect(()=>{
         const fetchListing =async() =>{
             try {
@@ -114,6 +115,13 @@ function Listing(props) {
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
+            {currentUser && currentUser._id !== listing.userRef && !contact &&(
+              <button onClick={()=>setcontact(true)} className='bg-custom_green-400 text-white p-3 font-bold'>Contact Agent</button>
+            )}
+
+            {contact && <Contact listing={listing}/>}
+            
+            
             </div>
             
             </div>
