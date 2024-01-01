@@ -184,9 +184,9 @@ function Profile(props) {
                 
                 <h1 className='text-center text-gray-600 font-semibold text-2xl'>{currentUser.username}</h1>
                 <h1 className='text-center text-gray-600 font-bold text-2xl '>{currentUser.email}</h1>
-                <div className='flex  gap-6 p-7 mt-48'>
-                    <span className='cursor-pointer bg-custom_green-400 p-1 text-white rounded-lg ' onClick={handleDelete}>Delete Account</span>
-                    <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg ' onClick={handleSignout}>Sign Out</span>
+                <div className='flex justify-between p-7 mt-48'>
+                    <span className='cursor-pointer p-1 text-red-700 rounded-lg  hover:underline' onClick={handleDelete}>Delete Account</span>
+                    <span className='cursor-pointer  text-custom_green-400 p-1 rounded-lg hover:underline ' onClick={handleSignout}>Sign Out</span>
                 </div>
             </div>
             <div className='flex flex-col w-1/3 justify-start items-center mt-4 gap-8  '>
