@@ -15,7 +15,7 @@ function Search(props) {
     const navigate = useNavigate();
     const[loading ,setLoading] = useState(false);
     const[listings,setListings] = useState([]);
-    console.log(listings)
+    const [showmore,setshowmore] = useState(false);
     
     
 
@@ -100,9 +100,15 @@ function Search(props) {
 
         const fetchListings =async()=>{
             setLoading(true);
+            setshowmore(false);
             const searchQuery  = urlParams.toString();
             const res= await fetch(`/api/listing/get?${searchQuery}`);
             const data = await res.json();
+            if(data.length>8){
+                setshowmore(true);
+            }else{
+                setshowmore(false);
+            }
             setListings(data);
             setLoading(false);
         }
@@ -110,6 +116,25 @@ function Search(props) {
 
       
     },[location.search]);
+
+
+
+    async function onShowmoreClick(e) {
+        const numberOfListing = listings.length;
+        const startIndex= numberOfListing;
+        const urlParams = new URLSearchParams(location.search);
+        urlParams.set('startIndex', startIndex);
+        const searchQuery = urlParams.toString();
+        const res = await fetch(`/api/listing/get?${searchQuery}`);
+        const data = await res.json();
+
+        if(data.length<9){
+            setshowmore(false);
+        }
+        setListings({...listings , ...data});
+    }
+
+    
 
 
     
@@ -176,6 +201,9 @@ function Search(props) {
                     )}
                     {!loading && listings && listings.map((listing) =>
                         <ListingItem key={listing._id} listing={listing} />
+                    )}
+                    {showmore &&(
+                        <button onClick={onShowmoreClick} className='text-green-700 hover:underline p-7 text-center w-full'>Show more</button>
                     )}
                 </div>
             </div>
