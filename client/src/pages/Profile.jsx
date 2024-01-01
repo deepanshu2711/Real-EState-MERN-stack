@@ -163,7 +163,7 @@ function Profile(props) {
 
     return (
         <div className='flex w-full h-screen'>
-            <div className=' rounded-xl w-1/3 bg-custom_green-400 bg-opacity-80 h-screen flex flex-col gap-4'>
+            <div className=' rounded-xl w-1/3  bg-opacity-80 h-screen flex flex-col gap-4'>
                 
                 <input type='file' onChange={(e) => setfile(e.target.files[0])} ref={fileRef} hidden accept='/image/*' />
                 <img  onClick={() => fileRef.current.click()} className='rounded-full h-40 w-40 object-cover self-center mt-12 border border-slate-950 cursor-pointer' src={ formdata.avatar ||currentUser.avatar} alt='profile image' />
@@ -182,11 +182,11 @@ function Profile(props) {
           )}
         </p>
                 
-                <h1 className='text-center text-white font-semibold text-2xl'>{currentUser.username}</h1>
-                <h1 className='text-center text-white font-bold text-2xl '>{currentUser.email}</h1>
-                <div className='flex justify-between p-7 mt-48'>
-                    <span className='cursor-pointer bg-red-500 p-1 text-white rounded-lg border shadow-md' onClick={handleDelete}>Delete Account</span>
-                    <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg border shadow-md' onClick={handleSignout}>Sign Out</span>
+                <h1 className='text-center text-gray-600 font-semibold text-2xl'>{currentUser.username}</h1>
+                <h1 className='text-center text-gray-600 font-bold text-2xl '>{currentUser.email}</h1>
+                <div className='flex  gap-6 p-7 mt-48'>
+                    <span className='cursor-pointer bg-custom_green-400 p-1 text-white rounded-lg ' onClick={handleDelete}>Delete Account</span>
+                    <span className='cursor-pointer bg-custom_green-300 text-white p-1 rounded-lg ' onClick={handleSignout}>Sign Out</span>
                 </div>
             </div>
             <div className='flex flex-col w-1/3 justify-start items-center mt-4 gap-8  '>
@@ -203,7 +203,7 @@ function Profile(props) {
                 </form>
                 
             </div>
-            <div className='rounded-xl w-1/3 p-3 flex flex-col items-center bg-custom_green-300'>
+            <div className='rounded-xl w-1/3 p-3 flex flex-col items-center'>
             <button onClick={handleShowListings} className='w-1/3 h-14 text-custom_green-300 bg-custom_green-100 font-bold p-3 rounded-lg'>Show Listings</button>
             <p>{showListingerroer==true &&"Error showing listings"}</p>
             

@@ -11,7 +11,7 @@ export default function ListingItem({ listing }) {
                     src={listing.imageUrls[0]}
                     alt="listing cover"
                 />
-                <div className='p-3 flex flex-col gap-2 w-full'>
+                <div className='p-3 flex flex-col gap-2 w-full'> 
                     <p className='text-lg font-semibold text-custom_green-400 truncate'>{listing.name}</p>
                     <div className='flex gap-2 items-center'>
                         <MdLocationOn className='h-4 w-4 text-green-700' />
